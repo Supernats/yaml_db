@@ -10,22 +10,36 @@ module YamlDb
         @extension = helper.extension
       end
 
-      def dump(filename)
+      def dump(filename, table: nil)
         disable_logger
-        File.open(filename, "w") do |file|
-          @dumper.dump(file)
+        if table
+          File.open(table.to_s, "w") do |file|
+            @dumper.dump(file, table: table)
+          end
+        else
+          File.open(filename, "w") do |file|
+            @dumper.dump(file)
+          end
         end
         reenable_logger
       end
 
-      def dump_to_dir(dirname)
+      def dump_to_dir(dirname, table: nil)
         Dir.mkdir(dirname)
-        tables = @dumper.tables
-        tables.each do |table|
+        if table
           File.open("#{dirname}/#{table}.#{@extension}", "w") do |io|
             @dumper.before_table(io, table)
             @dumper.dump_table io, table
             @dumper.after_table(io, table)
+          end
+        else
+          tables = @dumper.tables
+          tables.each do |table|
+            File.open("#{dirname}/#{table}.#{@extension}", "w") do |io|
+              @dumper.before_table(io, table)
+              @dumper.dump_table io, table
+              @dumper.after_table(io, table)
+            end
           end
         end
       end
@@ -148,11 +162,17 @@ module YamlDb
 
       end
 
-      def self.dump(io)
-        tables.each do |table|
+      def self.dump(io, table: nil)
+        if table
           before_table(io, table)
           dump_table(io, table)
           after_table(io, table)
+        else
+          tables.each do |_table|
+            before_table(io, _table)
+            dump_table(io, _table)
+            after_table(io, _table)
+          end
         end
       end
 

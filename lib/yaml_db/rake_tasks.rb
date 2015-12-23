@@ -1,12 +1,12 @@
 module YamlDb
   module RakeTasks
-    def self.data_dump_task
-      SerializationHelper::Base.new(helper).dump(db_dump_data_file(helper.extension))
+    def self.data_dump_task(table: nil)
+      SerializationHelper::Base.new(helper).dump(db_dump_data_file(helper.extension)table: table)
     end
 
-    def self.data_dump_dir_task
+    def self.data_dump_dir_task(table: nil)
       dir = ENV['dir'] || "#{Time.now.strftime('%F_%T')}"
-      SerializationHelper::Base.new(helper).dump_to_dir(dump_dir("/#{dir}"))
+      SerializationHelper::Base.new(helper).dump_to_dir(dump_dir("/#{dir}"), table: table)
     end
 
     def self.data_load_task
